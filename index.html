@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>BEANSTERS</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>BEANSTERS<small>Sort the beans, balance the rows!</small></h1>
+    <div class="stats">
+      <div class="stat">
+        <button id="sName" class="player-name-btn" type="button" title="Change name">—</button>
+        <span>Player</span>
+      </div>
+      <div class="stat"><b id="sLevel">1</b><span>Level</span></div>
+      <div class="stat"><b id="sTime">0:00</b><span>Time</span></div>
+      <div class="stat"><b id="sScore">0</b><span>Score</span></div>
+      <div class="stat"><b id="sLives">♥♥♥</b><span>Lives</span></div>
+    </div>
+  </header>
+  <div class="chips" id="chips"></div>
+  <div class="banner" id="banner" hidden></div>
+  <div class="board-wrap"><div class="board" id="board"></div></div>
+  <div class="tray-head"><span>Bean tray</span><span id="trayNote"></span></div>
+  <div class="tray" id="tray"></div>
+  <div class="controls">
+    <button class="btn" id="bHint" type="button">Hint</button>
+    <button class="btn" id="bClear" type="button">Clear board</button>
+<button class="btn" id="bHelp" type="button">How to play</button>
+    <span class="spacer"></span>
+    <div class="lvl">
+      <button class="btn" id="bPrev" type="button" aria-label="Previous level">◀</button>
+      <input id="lvlInput" type="number" min="1" inputmode="numeric" aria-label="Go to level">
+      <button class="btn" id="bGo" type="button">Go</button>
+      <button class="btn" id="bNext" type="button" aria-label="Next level">▶</button>
+    </div>
+  </div>
+  <p class="foot">Works offline. White dots mark beans placed by a hint. <button class="foot-link" id="bAbout" type="button">About &amp; Privacy</button></p>
+</div>
+
+<!-- Win modal -->
+<div class="overlay" id="win" hidden>
+  <div class="card" role="dialog" aria-labelledby="winTitle">
+    <h2 id="winTitle">Beaned!</h2>
+    <div class="stars" id="winStars"></div>
+    <p id="winText"></p>
+    <p id="winPts"></p>
+    <button class="btn primary" id="bWinNext" type="button">Next level</button>
+    <button class="btn" id="bWinStay" type="button">Review Board</button>
+  </div>
+</div>
+
+<!-- Help modal -->
+<div class="overlay" id="help" hidden>
+  <div class="card help-card" role="dialog" aria-labelledby="helpTitle">
+    <h2 id="helpTitle">How to play</h2>
+    <ul class="help-list">
+      <li>Every row reads left to right and every column reads top to bottom. Each must equal the target at its end.</li>
+      <li><b>No operator precedence.</b> 2 + 3 × 4 is worked as (2 + 3) × 4 = 20, one step at a time.</li>
+      <li>Every step must stay a whole number, so a division only works if it comes out exact.</li>
+      <li>Pick a tile from the tray, then tap an empty slot (or tap the slot first). Tap a placed tile to lift it back out. You can also <b>drag beans</b> directly onto the board.</li>
+      <li><b>The timer starts on your first move.</b> Take your time reading the board — the clock only begins when you place your first bean.</li>
+      <li><b>You have 3 lives ♥♥♥.</b> Every time a fully filled row or column evaluates to the wrong total, you lose one life. Lose all three and you'll sit out a 5-minute cool-off. Lives reset at the start of every game.</li>
+      <li>Later levels add decoy tiles that fit nowhere, blank operators you choose yourself, negative running totals, and larger grids.</li>
+      <li>Any arrangement that satisfies every target counts. Three stars: no hints, under par time.</li>
+      <li>Levels never run out. Your progress is saved in this browser.</li>
+    </ul>
+    <button class="btn primary" id="bHelpClose" type="button">Got it!</button>
+  </div>
+</div>
+
+<!-- About & Privacy modal -->
+<div class="overlay" id="about" hidden>
+  <div class="card help-card" role="dialog" aria-labelledby="aboutTitle">
+    <h2 id="aboutTitle">About</h2>
+    <ul class="help-list">
+      <li><b>BEANSTERS</b> is a colorful bean-themed math puzzle. Place numbered beans into the grid so every row and column equals its target. Math is evaluated strictly left to right — no operator precedence.</li>
+      <li>Levels scale in difficulty: larger grids, decoy tiles, hidden operators, and negative numbers as you progress. Levels never run out.</li>
+      <li><b>Privacy.</b> All your progress (username, level, score, stars) is stored only in your browser's local storage under the key <code>numeral-loom-v1</code>. Nothing is ever sent to any server. Clearing your browser's site data will reset your progress.</li>
+      <li>Built with plain HTML, CSS, and JavaScript. No frameworks, no tracking, no cookies.</li>
+    </ul>
+    <button class="btn primary" id="bAboutClose" type="button">Close</button>
+  </div>
+</div>
+
+<!-- Welcome / login modal -->
+<div class="overlay" id="welcome">
+  <div class="card welcome-card" role="dialog" aria-labelledby="wTitle">
+    <h2 id="wTitle">BEANSTERS</h2>
+
+    <!-- New player or rename -->
+    <div id="wNew">
+      <p class="w-sub">Sort the beans, balance the rows!</p>
+      <div class="w-field">
+        <label for="nameInput">What's your name?</label>
+        <input id="nameInput" type="text" maxlength="20" autocomplete="off" spellcheck="false" placeholder="Enter your name...">
+      </div>
+      <button class="btn primary" id="bPlay" type="button">Let's Bean!</button>
+    </div>
+
+    <!-- Returning player -->
+    <div id="wBack" hidden>
+      <div class="w-player" id="wBackName"></div>
+      <p class="w-stats" id="wBackStats"></p>
+      <button class="btn primary" id="bPlayBack" type="button">Play!</button>
+      <button class="btn" id="bChangeName" type="button">Change name</button>
+    </div>
+  </div>
+</div>
+
+<div id="splash" hidden></div>
+
+<!-- Timeout modal -->
+<div class="overlay" id="timeout" hidden>
+  <div class="card timeout-card" role="dialog" aria-labelledby="timeoutTitle">
+    <h2 id="timeoutTitle">No more beans!</h2>
+    <p>You've run out of lives. Take a short break — your beans will be ready in:</p>
+    <div class="timeout-timer" id="timeoutTimer">5:00</div>
+    <p class="timeout-sub">Come back refreshed and ready to bean!</p>
+  </div>
+</div>
+
+<script type="module" src="game.js"></script>
+</body>
+</html>
